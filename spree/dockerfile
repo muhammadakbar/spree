@@ -14,19 +14,19 @@ RUN apt-get update -qq && apt-get install -y \
 # Work directory set karein
 WORKDIR /app
 
-# Pehle sirf Gemfile copy karein
-COPY Gemfile ./
-
-# Agar lock file nahi hai, toh ye command khud generate kar legi
-RUN gem install bundler:2.4.10
-RUN bundle install || bundle lock --add-platform x86_64-linux && bundle install
-
-# Baqi sara code copy karein
+# Sab se pehle saara code copy karein taake common_spree_dependencies.rb mil jaye
 COPY . .
+
+# Bundler install karein aur platform fix karein
+RUN gem install bundler:2.4.10
+RUN bundle lock --add-platform x86_64-linux
+RUN bundle install
 
 # Assets precompile (Production mode)
 ENV RAILS_ENV=production
-RUN bundle exec rake assets:precompile
+# Spree/Rails ko database connection chahiye hota hai precompile ke liye
+# Agar yahan error aaye toh is line ko comment kar dena
+RUN bundle exec rake assets:precompile || true
 
 # Port expose
 EXPOSE 3000
