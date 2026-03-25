@@ -1,7 +1,6 @@
-# Ruby 3.2.2 use karein
 FROM ruby:3.2.2
 
-# System dependencies
+# Dependencies
 RUN apt-get update -qq && apt-get install -y \
     build-essential libpq-dev nodejs npm imagemagick yarn git
 
@@ -10,8 +9,6 @@ WORKDIR /app
 # --- YAHAN CHANGE HAI ---
 # Hum spree folder ke andar se Gemfile uthayenge
 COPY spree/Gemfile ./ 
-
-# Agar spree/Gemfile.lock hai toh wo bhi copy karein (optional)
 COPY spree/Gemfile.lock* ./
 
 # Bundler setup
