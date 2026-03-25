@@ -1,4 +1,4 @@
-# Ruby version jo aapki app use kar rahi hai
+# Ruby 3.2.2 use karein
 FROM ruby:3.2.2
 
 # System dependencies install karein
@@ -8,27 +8,28 @@ RUN apt-get update -qq && apt-get install -y \
     nodejs \
     npm \
     imagemagick \
-    yarn
+    yarn \
+    git
 
 # Work directory set karein
 WORKDIR /app
 
-# Gemfile aur lock file copy karein
-COPY Gemfile Gemfile.lock ./
+# Pehle sirf Gemfile copy karein
+COPY Gemfile ./
 
-# Bundler install karein aur gems install karein
+# Agar lock file nahi hai, toh ye command khud generate kar legi
 RUN gem install bundler:2.4.10
-RUN bundle install
+RUN bundle install || bundle lock --add-platform x86_64-linux && bundle install
 
 # Baqi sara code copy karein
 COPY . .
 
-# Assets precompile karein (Production ke liye)
+# Assets precompile (Production mode)
 ENV RAILS_ENV=production
 RUN bundle exec rake assets:precompile
 
-# Port expose karein
+# Port expose
 EXPOSE 3000
 
-# Server start karne ki command
+# Start command
 CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-p", "3000"]
